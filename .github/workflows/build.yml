@@ -1,0 +1,17 @@
+name: Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - id: ndk
+      run: echo "::set-output name=ANDROID_NDK::${ANDROID_SDK_ROOT}/ndk-bundle"
+    - uses: m4c0/gha-simple-cmake@e3ac067bb0eb9eb5fbd71bfe8d3ab6d629b873db
+      env:
+        ndk: ${{ steps.ndk.outputs.ANDROID_NDK }}
+      with:
+        extra_configure_flags: >
+          -DUMBRELLA=1
+          -DANDROID_NDK=${{ env.ndk }}
