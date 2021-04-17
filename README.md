@@ -30,6 +30,8 @@ There are extra tricks to make this work: the shared library definition also hav
 
 ## Q&A
 
+Some questions you may have if you want to use this project:
+
 * **Why CMake?**
 
   Because I like it and I use it for everything C++ related.
