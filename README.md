@@ -1,2 +1,3 @@
 # android-ndk-without-gradle
-Hello Android world without using Gradle
+
+This is an example of building and packaging an Android NDK application without using Gradle.

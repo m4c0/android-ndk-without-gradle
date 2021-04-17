@@ -1,0 +1,14 @@
+Checks: >-
+  *,
+  -fuchsia*,
+  -google-build-using-namespace,
+  -google-readability-namespace-comments,
+  -google-readability-todo,
+  -hicpp-braces-around-statements,
+  -llvm*,
+  -modernize-use-trailing-return-type,
+  -readability-braces-around-statements
+WarningsAsErrors: '*'
+CheckOptions:
+  - key: readability-uppercase-literal-suffix.NewSuffixes
+    value: 'L,LL,Lu,LLu'
