@@ -31,8 +31,10 @@ There are extra tricks to make this work: the shared library definition also hav
 ## Q&A
 
 * **Why CMake?**
+
   Because I like it and I use it for everything C++ related.
 * **Makefiles or Ninja?**
+
   It doesn't matter. As a personal preference, use Ninja. When automatically generated, Ninja is superior to Makefiles - specially because it's clever enough to run parallel builds without flags.
 
 ## What's wrong with Gradle?
@@ -40,14 +42,20 @@ There are extra tricks to make this work: the shared library definition also hav
 This deserves its own section:
 
 * **Android builds with Gradle requires a server running**
-  You are probably doing some architectural mistakes if you need a cache server to do normal builds.
+
+  You are probably doing some architectural mistakes if you need a cache server to do normal builds. It is useful if you do a daily clean build of a legacy large-scale project, but it is a bad sign when you need it when coding.
 * **Gradle forces you to learn Groovy**
+
   This [XKCD strip](https://xkcd.com/927/) describes why another build standard doesn't work:
   ![XKCD take on standards](https://imgs.xkcd.com/comics/standards.png) 
 * **Gradle forces you to use specific versions of CMake**
-  This is annoying when you want to use the latest and greatest of CMake
+
+  This is annoying when you want to use the latest and greatest of CMake.
 * **It is slow**
+
   The first build can take up to a minute to complete, between server starting and other Gradle shenanigans. 
+
   An incremental build takes precious seconds until it invokes CMake. That adds up and it is frustrating.
+
   Even a no-op (builds with no change) takes its time. Two seconds if the server is running, eight seconds otherwise. This is insane, compared to Ninja's 17ms.,
 
