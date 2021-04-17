@@ -47,4 +47,7 @@ This deserves its own section:
 * **Gradle forces you to use specific versions of CMake**
   This is annoying when you want to use the latest and greatest of CMake
 * **It is slow**
-  The first build can take up to a minute to complete, between server starting and other Gradle shenanigans. An incremental build takes precious seconds until it invokes CMake. That adds up and it is frustrating.
+  The first build can take up to a minute to complete, between server starting and other Gradle shenanigans. 
+  An incremental build takes precious seconds until it invokes CMake. That adds up and it is frustrating.
+  Even a no-op (builds with no change) takes its time. Two seconds if the server is running, eight seconds otherwise. This is insane, compared to Ninja's 17ms.,
+
