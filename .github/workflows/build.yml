@@ -15,3 +15,4 @@ jobs:
         extra_configure_flags: >
           -DUMBRELLA=1
           -DANDROID_NDK=${{ env.ndk }}
+    - run: find build
