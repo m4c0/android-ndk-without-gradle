@@ -2,6 +2,8 @@ include(ExternalProject)
 
 set(ANDROID_SDK_ROOT $ENV{ANDROID_SDK_ROOT} CACHE PATH "Path to Android SDK")
 
+set(ANDROID_PLATFORM_TOOLS_DIR "${ANDROID_SDK_ROOT}/platform-tools")
+
 file(GLOB ANDROID_BUILD_TOOLS_VERSIONS "${ANDROID_SDK_ROOT}/build-tools/*")
 list(POP_BACK ANDROID_BUILD_TOOLS_VERSIONS ANDROID_BUILD_TOOLS_LATEST)
 set(ANDROID_BUILD_TOOLS_DIR "${ANDROID_BUILD_TOOLS_LATEST}" CACHE PATH "Path to Android build tools (i.e. where to find aapt2, etc)")
@@ -14,9 +16,10 @@ file(GLOB ANDROID_JAR_VERSIONS "${ANDROID_SDK_ROOT}/platforms/*")
 list(POP_BACK ANDROID_JAR_VERSIONS ANDROID_JAR_LATEST)
 set(ANDROID_JAR "${ANDROID_JAR_LATEST}/android.jar" CACHE PATH "Path to Android JAR")
 
-find_program(AAPT2     NAMES aapt2     PATHS ${ANDROID_BUILD_TOOLS_DIR} REQUIRED)
-find_program(APKSIGNER NAMES apksigner PATHS ${ANDROID_BUILD_TOOLS_DIR} REQUIRED)
-find_program(ZIPALIGN  NAMES zipalign  PATHS ${ANDROID_BUILD_TOOLS_DIR} REQUIRED)
+find_program(ADB       NAMES adb       REQUIRED PATHS ${ANDROID_PLATFORM_TOOLS_DIR})
+find_program(AAPT2     NAMES aapt2     REQUIRED PATHS ${ANDROID_BUILD_TOOLS_DIR})
+find_program(APKSIGNER NAMES apksigner REQUIRED PATHS ${ANDROID_BUILD_TOOLS_DIR})
+find_program(ZIPALIGN  NAMES zipalign  REQUIRED PATHS ${ANDROID_BUILD_TOOLS_DIR})
 
 set(APK_CONTENTS_ROOT "${CMAKE_CURRENT_BINARY_DIR}/apk")
 
@@ -81,4 +84,4 @@ add_custom_command(
 
 add_custom_target(apk ALL DEPENDS ${FINAL_APK})
 
-# TODO: Maybe use a install target to do a `adb install`
+install(CODE "execute_process(COMMAND ${ADB} install ${FINAL_APK})")
