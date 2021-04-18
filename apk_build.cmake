@@ -18,6 +18,8 @@ find_program(AAPT2     NAMES aapt2     PATHS ${ANDROID_BUILD_TOOLS_DIR} REQUIRED
 find_program(APKSIGNER NAMES apksigner PATHS ${ANDROID_BUILD_TOOLS_DIR} REQUIRED)
 find_program(ZIPALIGN  NAMES zipalign  PATHS ${ANDROID_BUILD_TOOLS_DIR} REQUIRED)
 
+set(APK_CONTENTS_ROOT "${CMAKE_CURRENT_BINARY_DIR}/apk")
+
 macro(setup_variant VARIANT)
   ExternalProject_Add(${PROJECT_NAME}-${VARIANT}
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
@@ -27,7 +29,7 @@ macro(setup_variant VARIANT)
     -DANDROID_NDK=${ANDROID_NDK}
     -DANDROID_STL=c++_static
     -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/install/${VARIANT}
-    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${CMAKE_CURRENT_BINARY_DIR}/apk/lib/${VARIANT}
+    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=${APK_CONTENTS_ROOT}/lib/${VARIANT}
     -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK}/build/cmake/android.toolchain.cmake
     )
 endmacro()
@@ -38,14 +40,13 @@ setup_variant(x86_64)
 
 set(MANIFEST "${CMAKE_CURRENT_SOURCE_DIR}/AndroidManifest.xml")
 set(RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/res")
+set(KEYSTORE "${CMAKE_CURRENT_SOURCE_DIR}/keystore.jks")
 
 set(VALUES_STRING "${CMAKE_CURRENT_BINARY_DIR}/values_strings.arsc.flat")
 
-set(ALIGNED_APK "${CMAKE_CURRENT_BINARY_DIR}/app.apk")
+set(FINAL_APK "${CMAKE_CURRENT_BINARY_DIR}/app.apk")
 set(RESOURCES_APK "${CMAKE_CURRENT_BINARY_DIR}/app.res.apk")
 set(UNALIGNED_APK "${CMAKE_CURRENT_BINARY_DIR}/app.unaligned.apk")
-
-set(KEYSTORE "${CMAKE_CURRENT_SOURCE_DIR}/keystore.jks")
 
 # keytool -genkeypair -keystore keystore.jks -alias androidkey -validity 10000 -keyalg RSA -keysize 2048 -storepass android -keypass android
 
@@ -63,21 +64,21 @@ add_custom_command(
   OUTPUT ${UNALIGNED_APK}
   COMMAND ${CMAKE_COMMAND} -E tar x ${RESOURCES_APK}
   COMMAND ${CMAKE_COMMAND} -E tar c ${UNALIGNED_APK} --format=zip .
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/apk
+  WORKING_DIRECTORY ${APK_CONTENTS_ROOT}
   DEPENDS
-  ${RESOURCES_APK}
-  ${PROJECT_NAME}-armeabi-v7a
-  ${PROJECT_NAME}-arm64-v8a
-  ${PROJECT_NAME}-x86
-  ${PROJECT_NAME}-x86_64
+    ${RESOURCES_APK}
+    ${PROJECT_NAME}-armeabi-v7a
+    ${PROJECT_NAME}-arm64-v8a
+    ${PROJECT_NAME}-x86
+    ${PROJECT_NAME}-x86_64
   )
 add_custom_command(
-  OUTPUT ${ALIGNED_APK}
-  COMMAND ${ZIPALIGN} -p -f -v 4 ${UNALIGNED_APK} ${ALIGNED_APK}
-  COMMAND ${APKSIGNER} sign --in ${ALIGNED_APK} -ks ${KEYSTORE} --ks-key-alias androidkey --ks-pass pass:android --key-pass pass:android
+  OUTPUT ${FINAL_APK}
+  COMMAND ${ZIPALIGN} -p -f -v 4 ${UNALIGNED_APK} ${FINAL_APK}
+  COMMAND ${APKSIGNER} sign --in ${FINAL_APK} -ks ${KEYSTORE} --ks-key-alias androidkey --ks-pass pass:android --key-pass pass:android
   DEPENDS ${UNALIGNED_APK}
   )
 
-add_custom_target(apk ALL DEPENDS ${ALIGNED_APK})
+add_custom_target(apk ALL DEPENDS ${FINAL_APK})
 
 # TODO: Maybe use a install target to do a `adb install`
