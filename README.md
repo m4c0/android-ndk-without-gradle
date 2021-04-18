@@ -8,11 +8,11 @@ Again, this is an example. It's not a tutorial and you should think twice before
 
 If you want to try this project:
 
-1. Run something like this: `sh build.sh <path-to-ndk>`
+1. Run something like this: `sh build.sh`
 1. ???
 1. Profit
 
-This assumes you have the Android NDK installed and CMake.
+This assumes you have the Android NDK installed and CMake. It will use the latest version available for each required component.
 
 ## With a little bit more details:
 

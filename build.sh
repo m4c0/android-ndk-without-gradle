@@ -4,8 +4,7 @@
 
 set -ex
 
-NDK=$1
-[ -z "${NDK}" ] && exit 1;
+[ -z "${ANDROID_SDK_ROOT}" ] && exit 1
 
-cmake -S . -B build -GNinja -DUMBRELLA=1 -DANDROID_NDK=${NDK}
+cmake -S . -B build -GNinja -DUMBRELLA=1
 cmake --build build
