@@ -5,6 +5,7 @@ if(UMBRELLA)
   include(ExternalProject)
 
   find_program(AAPT2 NAMES aapt2 REQUIRED)
+  find_program(APKSIGNER NAMES apksigner REQUIRED)
   find_program(ZIPALIGN NAMES zipalign REQUIRED)
 
   macro(setup_variant VARIANT)
@@ -32,9 +33,13 @@ if(UMBRELLA)
 
   set(VALUES_STRING "${CMAKE_CURRENT_BINARY_DIR}/values_strings.arsc.flat")
 
-  set(ALIGNED_APK "${CMAKE_CURRENT_BINARY_DIR}/app.aligned.apk")
+  set(ALIGNED_APK "${CMAKE_CURRENT_BINARY_DIR}/app.apk")
   set(RESOURCES_APK "${CMAKE_CURRENT_BINARY_DIR}/app.res.apk")
   set(UNALIGNED_APK "${CMAKE_CURRENT_BINARY_DIR}/app.unaligned.apk")
+
+  set(KEYSTORE "${CMAKE_CURRENT_SOURCE_DIR}/keystore.jks")
+
+  # keytool -genkeypair -keystore keystore.jks -alias androidkey -validity 10000 -keyalg RSA -keysize 2048 -storepass android -keypass android
 
   add_custom_command(
     OUTPUT ${VALUES_STRING}
@@ -61,6 +66,7 @@ if(UMBRELLA)
   add_custom_command(
     OUTPUT ${ALIGNED_APK}
     COMMAND ${ZIPALIGN} -p -f -v 4 ${UNALIGNED_APK} ${ALIGNED_APK}
+    COMMAND ${APKSIGNER} sign --in ${ALIGNED_APK} -ks ${KEYSTORE} --ks-key-alias androidkey --ks-pass pass:android --key-pass pass:android
     DEPENDS ${UNALIGNED_APK}
     )
 
